@@ -5,10 +5,6 @@ RUN addgroup -g 11211 memcache && adduser -D -u 11211 -G memcache memcache
 
 # ensure SASL's "libplain.so" is installed as per https://github.com/memcached/memcached/wiki/SASLHowto
 RUN apk add --no-cache libsasl
-
-ENV MEMCACHED_VERSION 1.6.9
-ENV MEMCACHED_SHA1 42ae062094fdf083cfe7b21ff377c781011c2be1
-
 RUN set -x \
 	\
 	&& apk add --no-cache --virtual .build-deps \
@@ -24,15 +20,11 @@ RUN set -x \
 		openssl-dev \
 		perl \
 		perl-io-socket-ssl \
-		perl-utils \
-	\
-	&& wget -O memcached.tar.gz "https://memcached.org/files/memcached-$MEMCACHED_VERSION.tar.gz" \
-	&& echo "$MEMCACHED_SHA1  memcached.tar.gz" | sha1sum -c - \
-	&& mkdir -p /usr/src/memcached \
-	&& tar -xzf memcached.tar.gz -C /usr/src/memcached --strip-components=1 \
-	&& rm memcached.tar.gz \
-	\
-	&& cd /usr/src/memcached \
+		perl-utils 
+
+ADD memcached-1.6.9/ /usr/src/memcached
+	
+RUN cd /usr/src/memcached \
 	\
 	&& ./configure \
 		--build="$gnuArch" \
